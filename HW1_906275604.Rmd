@@ -1,0 +1,56 @@
+---
+title: "homework1 packege"
+author: "Jiayi Lian"
+date: "August 31, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework1
+
+# Jiayi Lian
+
+# Aug 31,2019
+
+## Problem 2
+
+### Part A
+
+1 Data analysis projects\newline
+2 Raw data manipulation\newline
+3 Database\newline
+
+Firstly, I would like to go through some data analysis projects to practice application of ML methods, such as xgboost, nnw, lgb, etc. Secondly, I am willing to work on raw data sets, which have flaws(like: Missing data, type error, measure error) and are not manipulated to be neat and formal. It is good to learn how to make raw data to be informative. In addition, knowledge of database is helpful when handling data.
+
+### Part B
+
+\begin{center}
+Noraml distribution:
+\begin{equation}
+  f(x| \mu, \sigma^{2}) = \frac{1} {\sqrt{2\pi}\sigma}e^{\frac{-(x-\mu)^{2}}{2\sigma^{2}}}
+\end{equation}
+
+T distribution:
+\begin{equation}
+  f(x| \nu) = \frac{\Gamma(\frac{\nu+1}{2})} {\Gamma(\frac{\nu}{2})}\frac{1}{\sqrt{\nu\pi}}\frac{1}{(1+(\frac{x^{2}}{\nu}))^{(\frac{(\nu+1)}{2})}}
+\end{equation}
+
+Cauchy distribution:
+\begin{equation}
+  f(x|\theta,\sigma) = \frac{1}{\pi\sigma}\frac{1}{1+(\frac{x-\theta}{\sigma})^{2}}
+\end{equation}
+\end{center}
+
+## Problem 3,4
+
+```{r}
+#See data frams of chickwts
+str(chickwts)
+#Choose weight as Y id as X to produce the scatter plot
+plot(x = seq(1:length(chickwts$weight)), y=chickwts$weight, type="p", ylab = "Weight", xlab = "id", main = "Chicken's weight")
+```
+
+
