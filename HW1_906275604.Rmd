@@ -44,7 +44,14 @@ Cauchy distribution:
 \end{equation}
 \end{center}
 
-## Problem 3,4
+## Problem 3
+
+1 Do data analysis step by step. Rules: Data manipulation should be standard. Store raw data behind plots. Set an increasing layers of details and allow all details to be discovered.
+2 Producing results. Rules:Explain how every result is produced and give each result an texture(Interpretation). Store intermediate results in a standard format if possible.
+3 Version records and control. Rules: Record all versions of all external programs. Using a specific version of script. Note random seeds if necessary.
+4 Give public access to data, results, versions, etc.
+
+## Problem 4
 
 ```{r}
 #See data frams of chickwts
