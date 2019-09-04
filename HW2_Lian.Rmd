@@ -1,0 +1,13 @@
+---
+title: "HW2_Lian"
+author: "Jiayi Lian"
+date: "September 4, 2019"
+output: pdf_document
+---
+
+# Homework2
+
+## P3
+
+It can help 
+
