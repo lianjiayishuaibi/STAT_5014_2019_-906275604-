@@ -9,5 +9,26 @@ output: pdf_document
 
 ## P3
 
-It can help 
+It can help me know how far have you gone through in your project.I can also see what changes have been done after each version created. There is more convenience. If I am not satisfied with my final version, I am able to find proper immediate version to start. It would save my time to go back step by step.
 
+## p4
+
+```{r}
+# Store url 
+# In the order of "sensory data, gold medal performance, brain weight vs body weight, triplicate measurements of tomato."
+url_sensory<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/Sensory.dat"
+url_gold<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/LongJumpData.dat"
+url_brain<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/BrainandBodyWeight.dat"
+url_tomato<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/tomato.dat"
+#download into local memory
+#Sensory<-read.table(url_sensory,header =  T,skip = 1)
+Sensory<-read.csv(url_sensory,header =  F,skip = 2,sep = "")
+dim(Sensory)
+Sensory<-as.array(Sensory)
+Sensory
+str(Sensory)
+```
+
+```{r}
+?as.array
+```
