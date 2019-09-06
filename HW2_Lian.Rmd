@@ -13,9 +13,19 @@ It can help me know how far have you gone through in your project.I can also see
 
 ## p4
 
+Before munge, I took a glimpse of dats. I saw that colnames, rownames, obs are mixed together. I have to break the data into pieces then aggregate in a tidy format. Sometimes, obs are record in a string. So I should also split the string.
+
+```{r include=FALSE}
+install.packages('dplyr',repo="https://cran.cnr.Berkeley.edu/")
+library('dplyr')
+library('tidyr')
+library('stats')
+```
+
 ```{r}
 # Store url 
-# In the order of "sensory data, gold medal performance, brain weight vs body weight, triplicate measurements of tomato."
+# In the order of "sensory data, gold medal performance, brain weight vs body weight,
+# triplicate measurements of tomato."
 url_sensory<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/Sensory.dat"
 url_gold<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/LongJumpData.dat"
 url_brain<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/BrainandBodyWeight.dat"
@@ -44,12 +54,15 @@ for (i in 1:10) {
 rownames(Sen_2)<-paste('Item',as.character(text_paste))
 #Show table of Sensory data
 Sen_2
+str(Sen_2)
+summary(Sen_2)
 ```
 
 ```{r}
+#load gold medal performance dat
 gold<-read.csv(url_gold,header =  F,skip = 1,sep = "")
+#mung
 dim_gold<-dim(gold)
-dim_gold
 gold_2=c()
 for (i in 1:dim_gold[1]) {
   if (sum(i == c(5,6)))
@@ -59,12 +72,99 @@ for (i in 1:dim_gold[1]) {
 }
 gold_2<-data.frame(matrix(gold_2,ncol = 2,nrow = 22,byrow = T))
 colnames(gold_2)<-c('Year','Long Jump')
+rownames(gold_2)<-1:dim(gold_2)[1]
 gold_2[1]<-gold_2[1]+1900
+#show
+gold_2
+str(gold_2)
+summary(gold_2)
 ```
 
 ```{r}
-?matrix
+#load brain vs body weight dat
+brain<-read.csv(url_brain,header = F,sep='',skip = 1)
+#munge
+dim_bra<-dim(brain)
+braW_boW<-c()
+for (i in 1:dim_bra[1]) {
+  braW_boW<-c(braW_boW,as.matrix(brain[i,]))
+}
+not_na<-ifelse(is.na(braW_boW),F,T)
+braW_boW<-braW_boW[not_na]
+braW_boW<-data.frame(matrix(braW_boW,ncol=2,nrow = 62))
+colnames(braW_boW)<-c('Body Weight','Brain Weight')
+rownames(braW_boW)<-1:dim(braW_boW)[1]
+#show
+print(braW_boW)
+str(braW_boW)
+summary(braW_boW)
 ```
 ```{r}
+#download tomato dat
+tomato<-read.csv(url_tomato ,sep='',skip = 1,header = F)
+#munge
+t_colname<-as.matrix(paste('S_',as.character(seq(10000,30000,10000)),sep=""))
+t_rowname<-as.matrix(tomato$V1[2:3])
+t_meas<-c(as.matrix(tomato$V2[2]),as.matrix(tomato$V2[3]),as.matrix(tomato$V3[2]),as.matrix(tomato$V3[3]),as.matrix(tomato$V4[2]),as.matrix(tomato$V4[3]))
+t_meas<-data.frame(matrix(t_meas,ncol = 3,nrow = 2))
+colnames(t_meas)<-t_colname
 
+t_meas<-tbl_df(t_meas)
+t_meas<-t_meas %>% mutate(S_10000=as.character(S_10000),S_20000=as.character(S_20000),S_30000=as.character(S_30000))
+t_meas<-t_meas %>% separate(S_10000, into = c('first_10000','Second_10000',"Thrid_10000"), sep=",", extra = 'drop', remove = T) %>% separate(S_20000, into = c('first_20000','Second_20000',"Thrid_20000"), sep=",", extra = 'drop', remove = T) %>% separate(S_30000, into = c('first_30000','Second_30000',"Thrid_30000"), sep=",", extra = 'drop', remove = T)
+t_meas<-data.frame(t_meas)
+rownames(t_meas)<-t_rowname
+#show and summary
+t_meas
+str(t_meas)
+summary(t_meas)
+```
+
+
+
+
+## P5
+```{r include=F}
+# Path to data(I change the path as the given one is not working for some reason)
+.datapath <- file.path('C:\\Users\\lianjiayi\\Desktop',
+                      'plant-data.txt')
+# Read in data
+plants <- read.csv(.datapath, strip.white=TRUE, na.strings="")
+# Remove annoying columns
+.cols2rm <- c('Accepted.Symbol', 'Synonym.Symbol')
+plants <- plants[, !(names(plants) %in% .cols2rm)]
+# Make names pretty
+names(plants) <- c('Scientific_Name', 'Duration', 'Active_Growth_Period',
+                   'Foliage_Color', 'pH_Min', 'pH_Max',
+                   'Precip_Min', 'Precip_Max',
+                   'Shade_Tolerance', 'Temp_Min_F')
+```
+
+```{r}
+#Relationship between PH and Foliage_Color
+#munge
+#since there are a huge amount of missing values in pH_Min, pH_Max, and Foliage_Color and fill these NA with a value are going to change their relationship report subjectively, we omit obs having at least one missing value.
+#After testing, Foliage_Color has 4334 NAs, pH_Max and pH_Max each has 4327 NAs, and these NAs almost appear at the same obs. Thus, we just use the index indicating where is not NA in Foliage_color to make sure no NA remains in our dat.
+plants_adj<-data.frame(Foliage_Color=plants$Foliage_Color[!is.na(plants$Foliage_Color)],pH_Min=plants$pH_Min[!is.na(plants$Foliage_Color)],pH_Max=plants$pH_Max[!is.na(plants$Foliage_Color)])
+
+#Creat new Ph var by average of PH-min and PH-max
+plants_adj<-tbl_df(plants_adj)
+plants_adj<-plants_adj %>% mutate(Ave_ph=(pH_Min+pH_Max)/2) %>% mutate(norm_ave=Ave_ph-mean(Ave_ph))
+
+# Set number for each color in an order
+plants_adj<-plants_adj %>%mutate(Foliage_Color=ifelse(Foliage_Color=='Dark Green',1,Foliage_Color),
+Foliage_Color=ifelse(Foliage_Color=='Gray-Green',2,Foliage_Color),
+Foliage_Color=ifelse(Foliage_Color=='Green',3,Foliage_Color),
+Foliage_Color=ifelse(Foliage_Color=='Red',4,Foliage_Color),
+Foliage_Color=ifelse(Foliage_Color=='White-Gray',5,Foliage_Color),
+Foliage_Color=ifelse(Foliage_Color=='Yellow-Green',6,Foliage_Color))
+
+#Build Reg model
+reg_Plant<-lm(Foliage_Color~norm_ave,plants_adj)
+
+#Coefficients
+reg_Plant
+
+#Anova report
+anova(reg_Plant)
 ```
