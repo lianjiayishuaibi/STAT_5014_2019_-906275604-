@@ -1,0 +1,95 @@
+---
+title: "HW3_Lian"
+author: "Jiayi Lian"
+date: "September 13, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework3
+
+## p3
+
+```{r include=FALSE}
+install.packages('dplyr',repo="https://cran.cnr.Berkeley.edu/")
+library('dplyr')
+library('tidyr')
+library('stats')
+```
+
+```{r}
+# Store url 
+# In the order of "sensory data, gold medal performance, brain weight vs body weight,
+# triplicate measurements of tomato."
+url_sensory<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/Sensory.dat"
+url_gold<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/LongJumpData.dat"
+url_brain<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/BrainandBodyWeight.dat"
+url_tomato<-"http://www2.isye.gatech.edu/~jeffwu/wuhamadabook/data/tomato.dat"
+```
+```{r}
+#download into local memory
+Sensory<-read.table(url_sensory, header=F, skip=1, fill=T, stringsAsFactors = F)
+#manipulate data into a tidy format
+#transfer data into a vector
+Sen_2<-Sensory[-1,]
+Sen_2_a<-Sen_2 %>% filter(V1 %in% 1:10) %>%
+                    rename(Item=V1,V1=V2,V2=V3,V3=V4,V4=V5,V5=V6)
+Sen_2_b<-Sen_2 %>% filter(!(V1 %in% 1:10)) %>%
+                    mutate(Item=rep(as.character(1:10),each=2)) %>%
+                    mutate(V1=as.numeric(V1)) %>%
+                    select(c(Item,V1:V5)) 
+Sen_final<-Sen_2_a %>% full_join(Sen_2_b) 
+#Show table of Sensory data
+Sen_final
+str(Sen_final)
+summary(Sen_final)
+```
+
+```{r}
+#load gold medal performance dat
+gold<-read.table(url_gold, header =  F,skip = 1, fill=T)
+#mung
+gold_a<-gold %>% select(c(V1,V2)) %>% mutate(Year= V1+1900, Performance=V2) %>% select(c(Year,Performance))
+gold_b<-gold %>% select(c(V3,V4)) %>% mutate(Year= V3+1900, Performance=V4) %>% select(c(Year,Performance))
+gold_c<-gold %>% select(c(V5,V6)) %>% mutate(Year= V5+1900, Performance=V6) %>% select(c(Year,Performance))
+gold_d<-gold %>% select(c(V7,V8)) %>% mutate(Year= V7+1900, Performance=V8) %>% select(c(Year,Performance)) %>% filter(!is.na(Year))
+gold_final<-gold_a %>% full_join(gold_b) %>% full_join(gold_c) %>% full_join(gold_d)
+#show
+gold_final
+str(gold_final)
+summary(gold_final)
+```
+
+```{r}
+#load brain vs body weight dat
+brain<-read.table(url_brain,header = F,skip = 1,fill = T)
+#munge
+brain_a<-brain %>% select(V1,V2) %>% mutate(Brain_weight=V1,Body_weight=V2) %>% select(Brain_weight,Body_weight)
+brain_b<-brain %>% select(V3,V4) %>% mutate(Brain_weight=V3,Body_weight=V4) %>% select(Brain_weight,Body_weight)
+brain_c<-brain %>% select(V5,V6) %>% mutate(Brain_weight=V5,Body_weight=V6) %>% select(Brain_weight,Body_weight) %>% filter(!is.na(Brain_weight))
+brain_final<-brain_a %>% full_join(brain_b) %>% full_join(brain_c)
+#show
+print(brain_final)
+str(brain_final)
+summary(brain_final)
+```
+```{r}
+#download tomato dat
+tomato<-read.table(url_tomato,fill=T, ,skip=1,header = F, stringsAsFactors = F,comment.char="*")
+#munge
+t_meas<-tomato[-1,]
+
+t_meas<-t_meas %>% mutate(V2=as.character(V2),S_20000=as.character(V2),V3=as.character(V3))%>% mutate(Spicies=V1) %>% select(c(Spicies,V2,V3,V4))
+t_meas<-t_meas %>% separate(V2, into = c('first_10000','Second_10000',"Thrid_10000"), sep=",", extra = 'drop', remove = T) %>% separate(V3, into = c('first_20000','Second_20000',"Thrid_20000"), sep=",", extra = 'drop', remove = T) %>% separate(V4, into = c('first_30000','Second_30000',"Thrid_30000"), sep=",", extra = 'drop', remove = T)
+#show and summary
+t_meas
+str(t_meas)
+summary(t_meas)
+```
+
+
+
+
