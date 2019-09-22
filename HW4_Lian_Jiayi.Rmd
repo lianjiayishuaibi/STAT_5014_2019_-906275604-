@@ -1,0 +1,151 @@
+---
+title: "HW4_Lian_Jiayi"
+author: "Jiayi Lian"
+date: "September 20, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+install.packages("lintr", , repo = "https://cran.cnr.Berkeley.edu/")
+library('dplyr')
+library('tidyr')
+library(ggplot2)
+library(lintr)
+```
+
+## P4
+ 
+Use pip lines to make your code easily understanded. Use explicit returns. Naming vars by connected words. Naming private functions by starting with a dot. File names should end in '.R'. Place spaces around all infix operaters. Limit the number of words in one line.
+
+
+## P5
+
+```{r}
+lint(filename = "C:/Users/lianjiayi/Documents/STAT_5014_2019_-906275604-/HW3_Lian_Jiayi.Rmd")
+```
+put spaces around all infix operators
+only yse double qy=uotes
+commas should always have a space after
+lines should not be more than 80 characters
+
+## P6
+
+```{r}
+device <- readRDS(file = "C:/Users/lianjiayi/Downloads/HW4_data.rds")
+device %>% group_by(Observer) %>% mutate(dev1_mean = mean(dev1))
+
+# function plot single boxplot and violin plot
+stat_device<-function(rd)
+{ 
+  level <- as.numeric(levels(factor(rd$Observer)))
+  observer = rep(0,length(level))
+  mean_dev1 = rep(0,length(level))
+  mean_dev2 = rep(0,length(level))
+  sd_dev1 = rep(0,length(level))
+  sd_dev2 = rep(0,length(level))
+  cor_dev = rep(0,length(level))
+  for (i in 1:length(level)) {
+    observer[i] = level[i]
+    mean_dev1[i] = mean(rd$dev1[rd$Observer == level[i]])
+    mean_dev2[i] = mean(rd$dev2[rd$Observer == level[i]])
+    sd_dev1[i] = sd(rd$dev1[rd$Observer == level[i]])
+    sd_dev2[i] = sd(rd$dev2[rd$Observer == level[i]])
+    cor_dev[i] = cor(rd$dev2[rd$Observer == level[i]], rd$dev1[rd$Observer == level[i]])
+  }
+  stat <- data.frame(observer=as.factor(level), mean_dev1=mean_dev1, mean_dev2=mean_dev2, sd_dev1=sd_dev1, sd_dev2=sd_dev2, cor_dev = cor_dev)
+    boxplot(stat$mean_dev1,stat$mean_dev2, names = c('dev1',"dev2"), main='compare means of dev1 and dev2')
+    p <- stat %>% ggplot() + geom_violin(aes(x="dev1", y=sd_dev1),fill= 'red') + geom_violin(aes(x="dev2", y=sd_dev2),fill = 'blue')+ ylab('value') +ggtitle('Compare sd of dev1 and dev2')
+    print(p)
+  stat
+}
+stat_device(device) 
+
+# produce two boxplots and two violin plots
+
+stat_device<-function(rd)
+{ 
+  level <- as.numeric(levels(factor(rd$Observer)))
+  observer = rep(0,length(level))
+  mean_dev1 = rep(0,length(level))
+  mean_dev2 = rep(0,length(level))
+  sd_dev1 = rep(0,length(level))
+  sd_dev2 = rep(0,length(level))
+  cor_dev = rep(0,length(level))
+  for (i in 1:length(level)) {
+    observer[i] = level[i]
+    mean_dev1[i] = mean(rd$dev1[rd$Observer == level[i]])
+    mean_dev2[i] = mean(rd$dev2[rd$Observer == level[i]])
+    sd_dev1[i] = sd(rd$dev1[rd$Observer == level[i]])
+    sd_dev2[i] = sd(rd$dev2[rd$Observer == level[i]])
+    cor_dev[i] = cor(rd$dev2[rd$Observer == level[i]], rd$dev1[rd$Observer == level[i]])
+  }
+  stat <- data.frame(observer=as.factor(level), mean_dev1=mean_dev1, mean_dev2=mean_dev2, sd_dev1=sd_dev1, sd_dev2=sd_dev2, cor_dev = cor_dev)
+    boxplot(stat$mean_dev1, names = c('dev1'),  main='means of dev1')
+    boxplot(stat$mean_dev1, names = c('dev2'),  main='means of dev2')
+    p1 <- stat %>% ggplot() + geom_violin(aes(x="dev1", y=sd_dev1),fill= 'red') + ylab('value') +ggtitle('sd of dev1')
+    print(p1)
+    p2 <- stat %>% ggplot() + geom_violin(aes(x="dev2", y=sd_dev2),fill = 'blue')+ ylab('value') +ggtitle('sd of dev2')
+    print(p2)
+  return(stat)
+}
+stat_device(device) 
+
+```
+
+
+```{r}
+R_integral<-function(h)
+{
+  point<- seq(0,1,h)
+  integral<- sum(exp(-point^2/2)*h)
+  return(integral)
+}
+
+width=c(0.1,0.01,0.001,0.0001,0.00001,0.000001)
+for (i in 1:length(width)) {
+  cat('Width= ',width[i],' Integration= ',R_integral(width[i]),'\n')
+}
+
+# Analytic solution is what showed below, but it seems way different from computation result.
+sqrt(pi/2*(1-exp(-0.5)))
+```      
+
+## P8
+
+```{r}
+target_fun<-function(x)
+  {
+  return(3^x-sin(x)-cos(5*x))
+}
+dif<-function(x)
+{
+  return(log(3)*3^x-cos(x)+5*sin(5*x))
+}
+newton<-function(interval, x)
+{
+  x0 = x
+  path=c(x0)
+  y=target_fun(x0)
+  while (abs(y)>1e-16) {
+    if(x0<interval[1]||x0>interval[2])
+    {
+      print("Out of the interval")
+      break
+    }
+    x_new=x0-y/dif(x0)
+    y=target_fun(x_new)
+    x0=x_new
+    path=c(path,x_new)
+  }
+  plot(path,main = "Iteration Path")
+  return(path)
+}
+newton(c(-3,3),0.4)
+```
+
+```{r}
+b=1
+sprintf('c= %s',b)
+cat('c',b)
+
+```
