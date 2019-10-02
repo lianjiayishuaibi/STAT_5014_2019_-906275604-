@@ -1,0 +1,93 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+## P2
+
+```{r}
+set.seed(12345)
+y <- seq(from=1, to=100, length.out = 1e8) + rnorm(1e8)
+S=0
+ybar=mean(y)
+
+system.time(for (i in 1:length(y)) {
+  S=S+(y[i]-ybar)^2
+})
+
+system.time(sum((y-ybar)^2))
+```
+
+## P3
+```{r}
+set.seed(1256)
+theta <- as.matrix(c(1,2),nrow=2)
+X <- cbind(1,rep(1:10,10))
+h <- X%*%theta+rnorm(100,0,0.2)
+lmfit<-lm(h~0+X)
+summary(lmfit)
+
+m=100 
+alpha=0.05
+theta0=1
+theta1=2
+theta0_old=0
+theta1_old=0
+x=rep(1:10,10)
+while (abs(theta0-theta0_old)>1e-6 & abs(theta1-theta1_old)>1e-6) {
+  theta0_old=theta0
+  theta1_old=theta1
+  theta0=theta0-alpha*sum(theta0+theta1*x-h)/m
+  theta1=theta1-alpha*sum((theta0+theta1*x-h)*x)/m
+}
+
+theta0
+theta1
+
+```
+
+## P4
+```{r}
+beta_est<-solve( t(X)%*%X) %*% t(X) %*% h
+beta_est
+```
+
+This estimator is same as the result from lm(h~0+X)
+
+## P5
+```{r}
+set.seed(12456) 
+G <- matrix(sample(c(0,0.5,1),size=16000,replace=T),ncol=10)
+R <- cor(G) # R: 10 * 10 correlation matrix of G
+C <- kronecker(R, diag(1600)) # C is a 16000 * 16000 block diagonal matrix
+id <- sample(1:16000,size=932,replace=F)
+q <- sample(c(0,0.5,1),size=15068,replace=T) # vector of length 15068
+A <- C[id, -id] # matrix of dimension 932 * 15068
+B <- C[-id, -id] # matrix of dimension 15068 * 15068
+p <- runif(932,0,1)
+r <- runif(15068,0,1)
+C<-NULL #save some memory space
+# a
+object.size(A)
+object.size(B)
+
+system.time({y=p+A%*%solve(B)%*%(q-r)})
+```
+
+b) I would calculate matrix addition firstly. Secondly, calculate the inverse of B. Then I product A and inverse of B. Next, AB^-1*(q-r). Finally, p-AB^-1*(q-r).
+
+c)Replace Rblas.dll:
+Here are the steps to replace the Rblas.dll file (for Windows users):
+
+1. Check what kind of processor (CPU) your PC or laptop is using (My computer –> Property). Download Rblas.dll from the corresponding directory under http://cran.r-project.org/bin/windows/contrib/ATLAS/.
+
+2. Go to your R directory tp locate where the Rblas.dll is, for example, c:/program files/R/R.2-7.0/bin. Rename it as Rblasold.dll so that if the new Rblass.dll doesn’t fit, you can use the old one by renaming it back.
+
+3. Copy the new Rblass.dll you just download in this folder.
+
+4. Restart R!
+
+reference:https://statmodeling.stat.columbia.edu/2008/06/22/a_trick_to_spee/
