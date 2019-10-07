@@ -129,4 +129,4 @@ p2
 #ggsave(plot = p, file = "HW6_Problem6_Plot_Settlage.pdf")
 ```
 
-Because packege fiftystates is not available for version 3.4.3. I just read the code posted and adjust it according to the requrement. It works in a lower version.
+Because packege fiftystates is not available for version 3.4.3 or other updating version. I just read the code posted and adjust it according to the requrement. It works in a lower version.
