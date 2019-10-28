@@ -41,12 +41,16 @@ time_original<-system.time(for (i in 1:boost_times) {
   beta[i,]= coef(summary(lm(y~operator, data = bootdata)))[,1]
 })
 
-# parallel
+# c)parallel
 ## Create a cluster via makeCluster
 cl <- makeCluster(8)
-time_parallel<-system.time(for (i in 1:boost_times) {
+boost_b<-function(n)
+{
   bootdata=sensory[sample(nrow(sensory), size = nrow(sensory), replace = TRUE),]
-  beta[i,]= coef(summary(lm(y~operator, data = bootdata)))[,1]
+  return(coef(summary(lm(y~operator, data = bootdata)))[,1])
+}
+time_parallel<-system.time(for (i in 1:boost_times) {
+  lapply(1:100,FUN=boost_b)
 })
 ## Stop the cluster
 stopCluster(cl)
@@ -127,11 +131,11 @@ theta <- as.matrix(c(1,2),nrow=2)
 X <- cbind(1,rep(1:10,10))
 h <- X%*%theta+rnorm(100,0,0.2)
 
-for (i in 1:1000) {
+Collect_Para<-function(n){
   theta0=3*runif(1)
   theta1=3*runif(1)
-  collect_data[i,1]=theta0
-  collect_data[i,2]=theta1
+  ori_beta0=theta0
+  ori_beta1=theta1
   theta0_old=0
   theta1_old=0
   Z=0
@@ -142,11 +146,10 @@ for (i in 1:1000) {
     theta0=theta0-alpha*sum(theta0+theta1*x-h)/m
     theta1=theta1-alpha*sum((theta0+theta1*x-h)*x)/m
   }
-  collect_data[i,3]=theta0
-  collect_data[i,4]=theta1
-  collect_data[i,5]=Z
+  return(c(ori_beta0,ori_beta1,theta0,theta1,Z))
 }
 
+collect_data<-matrix(unlist(lapply(1:1000,FUN=Collect_Para)),ncol = 5)
 stopCluster(cl)
 colnames(collect_data)<-c("Beta0_Ori","Beta1_Ori","Beta0","Beta1","Iteration")
 # show 1st 10 iterations' results
