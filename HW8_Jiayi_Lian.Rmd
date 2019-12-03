@@ -1,0 +1,77 @@
+---
+title: "HW8_Jiayi_Lian"
+author: "Jiayi Lian"
+date: "11/5/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidyr)
+library(formattable)
+library(ggplot2)
+library(ggExtra)
+```
+
+```{r}
+path<- "/Users/lianjiayi/Documents/STAT_5014_2019_-906275604-/Edstats_csv/EdStatsData.csv"
+edu <- read.csv(path)
+```
+
+## P3
+```{r}
+edu_none_miss<-edu %>% filter(!is.na(X1970)) %>% filter(!is.na(X1971)) %>% filter(!is.na(X1972)) %>% filter(!is.na(X1973)) %>% filter(!is.na(X1974)) %>% filter(!is.na(X1975) & !is.na(X1976) & !is.na(X1977) & !is.na(X1978) & !is.na(X1979) & !is.na(X1980) & !is.na(X1981) & !is.na(X1982) & !is.na(X1983) & !is.na(X1984) & !is.na(X1985) & !is.na(X1986) & !is.na(X1987) & !is.na(X1988) & !is.na(X1989) & !is.na(X1990) & !is.na(X1991) & !is.na(X1992) & !is.na(X1993) & !is.na(X1994) & !is.na(X1995) & !is.na(X1996) & !is.na(X1997) & !is.na(X1998) & !is.na(X1999) & !is.na(X2000) & !is.na(X2001) & !is.na(X2002) & !is.na(X2003) & !is.na(X2004) & !is.na(X2005) & !is.na(X2006) & !is.na(X2007) & !is.na(X2008) & !is.na(X2009) & !is.na(X2010) & !is.na(X2011) & !is.na(X2012) & !is.na(X2013) & !is.na(X2014)) 
+dim(edu)
+dim(edu_none_miss)
+```
+Before cleanning all missing values, there are 886930 x 45 observations. After cleanning, only 13294 x 45 observations left.
+
+```{r}
+# Number of indicators left for two countries
+Number_in_ARB<-edu_none_miss %>% filter(as.character(Country.Code) == 'ARB' )  %>% select(Indicator.Name) %>% summarise(count= n())
+Number_in_EAS<-edu_none_miss %>% filter(as.character(Country.Code) == 'EAS' )  %>% select(Indicator.Name) %>% summarise(count= n())
+tab<-matrix(c(Number_in_ARB,Number_in_EAS), ncol = 2)
+colnames(tab)<- c("ARB", "EAS")
+rownames(tab)<-c("number")
+tab
+```
+
+## P4
+```{r}
+# I would extract data of "Enrolement in secondary vocational, both sexes (number)" and "Enrolment in secondary vocational, female (number)" in Arab world from 1970 to 2014.
+
+X.Y<-edu_none_miss %>% filter(Country.Code == "ARB") %>% filter(Indicator.Code =="SE.SEC.ENRL.VO" | Indicator.Code =="SE.SEC.ENRL.VO.FE")  
+X.Y<-matrix(as.numeric(t(X.Y)[5:49,]),ncol=2)
+X<-X.Y[,1]
+Y<-X.Y[,2]
+scatterhist = function(x, y, xlab="", ylab=""){
+  zones=matrix(c(2,0,1,3), ncol=2, byrow=TRUE)
+  layout(zones, widths=c(4/5,1/5), heights=c(1/5,4/5))
+  xhist = hist(x, plot=FALSE)
+  yhist = hist(y, plot=FALSE)
+  top = max(c(xhist$counts, yhist$counts))
+  par(mar=c(3,3,1,1))
+  plot(x,y)
+  par(mar=c(0,3,1,1))
+  barplot(xhist$counts, axes=FALSE, ylim=c(0, top), space=0)
+  par(mar=c(3,0,1,1))
+  barplot(yhist$counts, axes=FALSE, xlim=c(0, top), space=0, horiz=TRUE)
+  par(mar=c(3,0,0,0))
+  mtext(xlab, side=1, line=1, outer=TRUE, adj=0, 
+    at=.8 * (mean(x) - min(x))/(max(x)-min(x)))
+  mtext(ylab, side=2, line=1, outer=TRUE, adj=0, 
+    at=(.8 * (mean(y) - min(y))/(max(y) - min(y))))
+}
+scatterhist(X,Y, xlab = "X", ylab = "Y")
+```
+
+
+## P5
+```{r}
+X.Y<-data.frame(X=X.Y[,1],X=X.Y[,2])
+p<-X.Y %>% ggplot(aes(x=X,y=Y)) +geom_point(alpha = .3)
+ggExtra::ggMarginal(p, type = "histogram")
+
+```
+
+
